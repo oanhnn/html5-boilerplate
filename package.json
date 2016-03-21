@@ -6,7 +6,8 @@
   "main": "src/main.js",
   "scripts": {
     "start": "gulp",
-    "production": "gulp --production"
+    "production": "gulp --production",
+    "archive": "gulp archive --production"
   },
   "repository": {
     "type": "git",

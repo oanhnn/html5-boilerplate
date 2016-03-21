@@ -43,6 +43,10 @@ npm start
 ```
 npm run production
 ```
+Archive production build files.
+```
+npm run archive
+```
 Development builds will copy compress version together with map file and uncompress version of vendor scripts.
 Your ES6 code will be transpiled into ES5 and concatenated into a single file.
 A sourcemap for your code will also be included (by default `app.map.js`).

@@ -11,6 +11,12 @@ Default: `./build/`
 
 ***
 
+**`ARCHIVE_PATH`** your archive folder's path, change it if you wish to rename the default folder.
+
+Default: `./archive/`
+
+***
+
 **`SCRIPTS_PATH`** should be contained inside the build folder, used to store Javascript files. 
 
 Default: `BUILD_PATH + '/js'`
