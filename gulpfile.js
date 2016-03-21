@@ -1,3 +1,5 @@
+var fs = require('fs');
+var path = require('path');
 var del = require('del');
 var gulp = require('gulp');
 var argv = require('yargs').argv;
@@ -15,6 +17,7 @@ var browserSync = require('browser-sync');
  * Using different folders/file names? Change these constants:
  */
 var BUILD_PATH = './build';
+var ARCHIVE_PATH = './archive';
 var SCRIPTS_PATH = BUILD_PATH + '/js';
 var STYLES_PATH = BUILD_PATH + '/css';
 var SOURCE_PATH = './src';
@@ -23,6 +26,7 @@ var ENTRY_FILE = SOURCE_PATH + '/main.js';
 var OUTPUT_FILE = 'app.js';
 
 var keepFiles = false;
+var pkg = require('./package.json');
 
 /**
  * Simple way to check for development/production mode.
@@ -84,7 +88,7 @@ function copyVendor() {
     //vendors['phaser/dist/phaser.js']  = SCRIPTS_PATH;
   }
 
-  var srcList = Object.keys(vendors).map(function(file) {
+  var srcList = Object.keys(vendors).map(function (file) {
     return './node_modules/' + file;
   });
 
@@ -145,23 +149,72 @@ function serve() {
   browserSync(options);
 
   // Watches for changes in files inside the './src' folder.
-  gulp.watch(SOURCE_PATH + '/**/*.js', ['watch-js']);
+  gulp.watch(SOURCE_PATH + '/**/*.js', ['watch:js']);
 
   // Watches for changes in files inside the './static' folder. Also sets 'keepFiles' to true (see cleanBuild()).
-  gulp.watch(STATIC_PATH + '/**/*', ['watch-static']).on('change', function () {
+  gulp.watch(STATIC_PATH + '/**/*', ['watch:static']).on('change', function () {
     keepFiles = true;
   });
 
 }
 
-gulp.task('cleanBuild', cleanBuild);
-gulp.task('copyStatic', ['cleanBuild'], copyStatic);
-gulp.task('copyVendor', ['copyStatic'], copyVendor);
-gulp.task('build', ['copyVendor'], build);
-gulp.task('fastBuild', build);
+/**
+ *
+ * Make archive directory
+ */
+function createArchiveDir() {
+  var dir = path.resolve(ARCHIVE_PATH);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, '0755');
+  }
+}
+
+/**
+ * Make archive file (zip format)
+ */
+function createArchiveFile(done) {
+  var archiveName = path.resolve(ARCHIVE_PATH, pkg.name + '_v' + pkg.version + '.zip');
+  var archiver = require('archiver')('zip');
+  var files = require('glob').sync('**/*.*', {
+    'cwd': BUILD_PATH,
+    'dot': false // exclude hidden files
+  });
+  var output = fs.createWriteStream(archiveName);
+
+  archiver.on('error', function (error) {
+    done();
+    throw error;
+  });
+
+  output.on('close', done);
+
+  files.forEach(function (file) {
+
+    var filePath = path.resolve(BUILD_PATH, file);
+
+    // `archiver.bulk` does not maintain the file
+    // permissions, so we need to add files individually
+    archiver.append(fs.createReadStream(filePath), {
+      'name': file,
+      'mode': fs.statSync(filePath)
+    });
+
+  });
+
+  archiver.pipe(output);
+  archiver.finalize();
+}
+
+gulp.task('clean', cleanBuild);
+gulp.task('copy:static', ['clean'], copyStatic);
+gulp.task('copy:vendor', ['copy:static'], copyVendor);
+gulp.task('build', ['copy:vendor'], build);
+gulp.task('build:fast', build);
 gulp.task('serve', ['build'], serve);
-gulp.task('watch-js', ['fastBuild'], browserSync.reload); // Rebuilds and reloads the project when executed.
-gulp.task('watch-static', ['copyVendor'], browserSync.reload);
+gulp.task('watch:js', ['build:fast'], browserSync.reload); // Rebuilds and reloads the project when executed.
+gulp.task('watch:static', ['copy:vendor'], browserSync.reload);
+gulp.task('archive:make-dir', createArchiveDir);
+gulp.task('archive', ['build', 'archive:make-dir'], createArchiveFile);
 
 /**
  * The tasks are executed in the following order:

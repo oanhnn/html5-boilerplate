@@ -17,6 +17,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "glob": "^5.0.5",
     "babelify": "^6.1.3",
     "browser-sync": "^2.8.0",
     "browserify": "^11.0.0",
@@ -25,6 +26,7 @@
     "vinyl-source-stream": "^1.1.0",
     "yargs": "^3.16.1",
     "normalize.css": "~3.0.3",
+    "archiver": "^0.14.3",
     "gulp": "^3.9.0",
     "gulp-buffer": "0.0.2",
     "gulp-if": "^1.2.5",
