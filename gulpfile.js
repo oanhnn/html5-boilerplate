@@ -28,6 +28,18 @@ var OUTPUT_FILE = 'app.js';
 var keepFiles = false;
 var pkg = require('./package.json');
 
+// list paths of vendor files
+var vendors = {
+  //'phaser/dist/phaser.min.js': SCRIPTS_PATH,
+  'normalize.css/normalize.css': STYLES_PATH
+};
+
+// If not in production mode, add `.map` file and un-compress version
+//if (!isProduction()) {
+//  vendors['phaser/dist/phaser.map'] = SCRIPTS_PATH;
+//  vendors['phaser/dist/phaser.js']  = SCRIPTS_PATH;
+//}
+
 /**
  * Simple way to check for development/production mode.
  */
@@ -76,18 +88,6 @@ function copyStatic() {
  * This way you can call 'npm update', get the latest vendor version and use it on your project with ease.
  */
 function copyVendor() {
-  // list paths of vendor files
-  var vendors = {
-    //'phaser/dist/phaser.min.js': SCRIPTS_PATH,
-    'normalize.css/normalize.css': STYLES_PATH
-  };
-
-  // If not in production mode, add `.map` file and un-compress version
-  if (!isProduction()) {
-    //vendors['phaser/dist/phaser.map'] = SCRIPTS_PATH;
-    //vendors['phaser/dist/phaser.js']  = SCRIPTS_PATH;
-  }
-
   var srcList = Object.keys(vendors).map(function (file) {
     return './node_modules/' + file;
   });

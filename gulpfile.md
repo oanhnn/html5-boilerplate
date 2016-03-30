@@ -1,4 +1,4 @@
-# Modifying `gulpfile.js` :raised_hands:
+# Modifying `gulpfile.js`
 
 There are seven variables that you can modify in order to easily adapt the behaviour
 of the Gulp file to your own needs.
@@ -50,6 +50,26 @@ Default: `SOURCE_PATH + '/main.js'`
 **`OUTPUT_FILE`** the name of the output transpiled file. 
 
 Default: `app.js`
+
+***
+
+## Vendors
+
+You can add more vendors to variable **`vendors`**, they will be copied automatically when you run gulp task.
+
+```js
+// list paths of vendor files
+var vendors = {
+  'phaser/dist/phaser.min.js': SCRIPTS_PATH,
+  'normalize.css/normalize.css': STYLES_PATH
+};
+
+// If not in production mode, add `.map` file and un-compress version
+if (!isProduction()) {
+  vendors['phaser/dist/phaser.map'] = SCRIPTS_PATH;
+  vendors['phaser/dist/phaser.js']  = SCRIPTS_PATH;
+}
+```
 
 ***
 
