@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var del = require('del');
+var header = require('gulp-header')
 var gulp = require('gulp');
 var argv = require('yargs').argv;
 var gutil = require('gulp-util');
@@ -27,6 +28,19 @@ var OUTPUT_FILE = 'app.js';
 
 var keepFiles = false;
 var pkg = require('./package.json');
+
+// Banner to be placed as header of js build file
+var enableHeader = false
+var banner =
+`/**
+* ${pkg.name}
+* ${pkg.description}
+* Compiled: ${Date()}
+* @version v${pkg.version}
+* @link ${pkg.homepage}
+* @copyright ${pkg.license}
+*/
+`
 
 // list paths of vendor files
 var vendors = {
@@ -128,7 +142,7 @@ function build() {
     .pipe(source(OUTPUT_FILE))
     .pipe(buffer())
     .pipe(gulpif(isProduction(), uglify()))
-    // TODO: add header
+    .pipe(gulpif(enableHeader, header(banner)))    
     .pipe(gulp.dest(SCRIPTS_PATH));
 
 }
